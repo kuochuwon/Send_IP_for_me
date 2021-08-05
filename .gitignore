@@ -1,0 +1,9 @@
+venv
+__pycache__
+log
+.vscode
+.env
+*.docx
+*.pdf
+*.xls
+*.xlsx
