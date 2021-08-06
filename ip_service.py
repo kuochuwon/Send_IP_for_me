@@ -1,9 +1,13 @@
 import subprocess
 import re
-from sys import stdout
+from pathlib import Path
+from log import logger, get_handler
 
 
 def get_ip():
+    self_command = "hostname"
+    p = subprocess.Popen(self_command, stdout=subprocess.PIPE, shell=True)
+    hostname = p.stdout.read().decode("big5")
     win_command = "ipconfig"
     p = subprocess.Popen(win_command, stdout=subprocess.PIPE, shell=True)
     output = p.stdout.read().decode("big5")
@@ -12,12 +16,17 @@ def get_ip():
     wsl_command = 'bash -c "ip addr"'  # HINT must use double quote
     p = subprocess.Popen(wsl_command, stdout=subprocess.PIPE, shell=True)
     output = p.stdout.read().decode("big5")
-    print("wsl:")
-    print(output)
     ipv4_rawdata = get_wsl_ip_info(output)
     wsl_ipv4_addr = extract_ip(ipv4_rawdata)
+    print(f"電腦名稱: {hostname}")
     print(f"您在Windows的IP為{win_ipv4_addr}")
     print(f"您在WSL2的IP為{wsl_ipv4_addr}")
+    ip_infor = f"以下為: {hostname}的IP相關資訊\nWindows的IP為: {win_ipv4_addr}\nWSL2的IP為: {wsl_ipv4_addr}"
+    logger.info(ip_infor)
+    if win_ipv4_addr and wsl_ipv4_addr:
+        return ip_infor
+    else:
+        return None
 
 
 def get_wsl_ip_info(std_out):
@@ -33,6 +42,8 @@ def get_wsl_ip_info(std_out):
 
 
 def extract_ip(string):
+    # HINT允許字串中合法IP後面跟著其他字元，但只會擷取合法IP
+    # ip_pattern_loose = "((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)(\\.(?!$)|)){4}"
     ip_pattern = "((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)(\\.(?!$)|$)){4}$"
     try:
         ipv4_addr = re.search(ip_pattern, string.strip()).group(0)
@@ -51,7 +62,6 @@ def get_windows_ip_info(std_out):
             ipv4_rawdata = output[index+4]
             return ipv4_rawdata
     print("找不到Windows IP")
-    return None
 
 
 def readdata():
@@ -60,6 +70,7 @@ def readdata():
 
     # HINT: ref: https://stackoverflow.com/questions/5284147/validating-ipv4-addresses-with-regexp
     ip_pattern = "((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)(\\.(?!$)|$)){4}$"
+
     with open("ipoutput.txt", "r", encoding="utf-8") as r:
         output = r.readlines()
         for index, lines in enumerate(output):
@@ -70,4 +81,6 @@ def readdata():
 
 
 if __name__ == "__main__":
+    log_name = Path(Path.cwd(), "logs", "ip_info.log")
+    logger.addHandler(get_handler(log_name))
     get_ip()

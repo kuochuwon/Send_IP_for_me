@@ -1,0 +1,8 @@
+[2021-08-06 23:41:41,053] [INFO] [ip_service] [MainThread] 以下為: DESKTOP-TLKU575
+的IP相關資訊
+Windows的IP為: 192.168.50.42
+WSL2的IP為: 172.24.162.200
+[2021-08-06 23:53:55,195] [INFO] [ip_service] [MainThread] 以下為: DESKTOP-TLKU575
+的IP相關資訊
+Windows的IP為: 192.168.50.42
+WSL2的IP為: 172.24.162.200
