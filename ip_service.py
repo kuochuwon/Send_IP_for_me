@@ -4,33 +4,47 @@ from pathlib import Path
 from log import logger, get_handler
 
 
-def get_ip():
-    self_command = "hostname"
-    # p = subprocess.Popen(self_command, stdout=subprocess.PIPE, shell=True)
-    # hostname = p.stdout.read().decode("big5")
-    # hostname = hostname.strip()
-    hostname = get_info_from_cmd(self_command)
-    win_command = "ipconfig"
-    # p = subprocess.Popen(win_command, stdout=subprocess.PIPE, shell=True)
-    # output = p.stdout.read().decode("big5")
-    output = get_info_from_cmd(win_command)
+def get_ip(mode):
+    """msg: 回傳訊息 var: 回傳win IP 與 WSL IP"""
+    hostname = get_info_from_cmd("hostname")
+    output = get_info_from_cmd("ipconfig")
     win_ipv4_addr = get_windows_ip_info(output)
-    # win_ipv4_addr = extract_ip(ipv4_rawdata)
-    wsl_command = 'bash -c "ip addr"'  # HINT must use double quote
-    # p = subprocess.Popen(wsl_command, stdout=subprocess.PIPE, shell=True)
-    # output = p.stdout.read().decode("big5")
-    output = get_info_from_cmd(wsl_command)
+    output = get_info_from_cmd('bash -c "ip addr"')  # HINT must use double quote
     wsl_ipv4_addr = get_wsl_ip_info(output)
-    # wsl_ipv4_addr = extract_ip(ipv4_rawdata)
-    print(f"電腦名稱: {hostname}")
-    print(f"您在Windows的IP為{win_ipv4_addr}")
-    print(f"您在WSL2的IP為{wsl_ipv4_addr}")
+
     ip_infor = f"以下為: {hostname}的IP相關資訊\nWindows的IP為: {win_ipv4_addr}\nWSL2的IP為: {wsl_ipv4_addr}"
     logger.info(ip_infor)
     if win_ipv4_addr and wsl_ipv4_addr:
-        return ip_infor
+        if mode == "msg":
+            return ip_infor
+        elif mode == "var":
+            return win_ipv4_addr, wsl_ipv4_addr
     else:
         return None
+
+
+def check_ip(curr_win_ip, curr_wsl_ip):
+    try:
+        with open("ip_memo.txt", "r") as f:
+            raw = f.read()
+            raw_list = raw.split(" ")
+            prev_win_ip = raw_list[0]
+            prev_wsl_ip = raw_list[1]
+
+        if (curr_win_ip == prev_win_ip) and (curr_wsl_ip == prev_wsl_ip):
+            logger.info("您的IP未偵測到變更")
+            return
+        elif (curr_win_ip == prev_win_ip) and (curr_wsl_ip != prev_wsl_ip):
+            logger.info(f"偵測到WSL IP變更! old: {prev_wsl_ip}, new: {curr_wsl_ip}")
+        elif (curr_win_ip != prev_win_ip) and (curr_wsl_ip == prev_wsl_ip):
+            logger.info(f"偵測到Win IP變更! old: {prev_win_ip}, new: {curr_win_ip}")
+        else:
+            logger.info(f"您的Win and WSL IP皆已變更! old Win/WSL IP: {prev_win_ip} / {prev_wsl_ip}\n"
+                        f"new Win/WSL IP: {curr_win_ip} / {curr_wsl_ip}")
+        with open("ip_memo.txt", "w") as f:
+            f.write(f"{curr_win_ip} {curr_wsl_ip}")
+    except Exception as e:
+        logger.error(f"{check_ip.__name__} failed: {e}")
 
 
 def get_info_from_cmd(command):
@@ -95,4 +109,5 @@ def readdata():
 if __name__ == "__main__":
     log_name = Path(Path.cwd(), "logs", "ip_info.log")
     logger.addHandler(get_handler(log_name))
-    get_ip()
+    win_ipv4_addr, wsl_ipv4_addr = get_ip("var")
+    check_ip(win_ipv4_addr, wsl_ipv4_addr)
