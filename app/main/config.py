@@ -32,41 +32,23 @@ class Config:
 class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
 
 
 class TestingConfig(Config):
     DEBUG = False
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = os.getenv("TEST_DATABASE_URL")
     PRESERVE_CONTEXT_ON_EXCEPTION = False
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    Config.SQLALCHEMY_ENGINE_OPTIONS["echo"] = False
-    Config.SQLALCHEMY_ENGINE_OPTIONS["echo_pool"] = False
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = os.getenv("DEV_DATABASE_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    Config.SQLALCHEMY_ENGINE_OPTIONS["echo"] = False
-    Config.SQLALCHEMY_ENGINE_OPTIONS["echo_pool"] = False
-    REDIS_SERVER = os.getenv("DEV_REDIS_SERVER")
-    REDIS_PORT = os.getenv("DEV_REDIS_PORT")
-    REDIS_PASS = os.getenv("DEV_REDIS_PASS")
 
 
 class HerokuConfig(Config):
     DEBUG = False
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = os.getenv("HEROKU_DATABASE_URL")
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    Config.SQLALCHEMY_ENGINE_OPTIONS["echo"] = False
-    Config.SQLALCHEMY_ENGINE_OPTIONS["echo_pool"] = False
-    REDIS_SERVER = os.getenv("HEROKU_REDIS_SERVER")
-    REDIS_PORT = os.getenv("HEROKU_REDIS_PORT")
-    REDIS_PASS = os.getenv("HEROKU_REDIS_PASS")
 
 
 __config_list = dict(
@@ -82,13 +64,3 @@ def get_config(config_name):
 
 
 jwt_key = Config.JWT_SECRET_KEY
-
-
-# MQTT Setting
-class MQTTConfig:
-    CLIENT_ID = str(os.getenv("MQTT_CLIENT_ID"))
-    ALIVE = int(os.getenv("MQTT_ALIVE"))
-    SERVER = str(os.getenv("MQTT_SERVER"))
-    PORT = int(os.getenv("MQTT_PORT"))
-    PUBLISH_TOPIC = str(os.getenv("MQTT_PUBLISH_TOPIC"))
-    QOS = int(os.getenv("MQTT_QOS"))

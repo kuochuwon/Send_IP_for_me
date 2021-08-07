@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from pathlib import Path
 
-# from app.main.config import get_config, Config
+from app.main.config import get_config, Config
 from app.main.log import logger, get_handler
 
 
@@ -20,7 +20,7 @@ def create_app(config_name):
     log_name = Path(Path.cwd(), "logs", "server.log")
     logger.addHandler(get_handler(log_name))
     app = Flask(__name__)
-    # app.config.from_object(get_config(config_name))
+    app.config.from_object(get_config(config_name))
     db.init_app(app)
     # bcrypt.init_app(app)
     jwt.init_app(app)
