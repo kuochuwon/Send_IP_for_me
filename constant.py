@@ -10,8 +10,6 @@ class LineConstant:
         "7PCT_helper": "6fd6a21c86d311aaf115d9588cc5fc46",
         "IP_service": "e2db01227b4a5ffaaf71f328d16f93e5"
     }
-    # CHANNEL_ACCESS_TOKEN = "qipp53w9dsKIjaDG3D5eYswChigJUmYdgD6ilha3BCHjF4rJmG8dVjj3kMqpBy4TvTnYODobZelFc5bsSz9ycEx09y/XU3aZO42Bp2o0+9f9TRJBFMeUih6Oi2YB77ET4+u5z/miOF5FRihh5ubRTgdB04t89/1O/w1cDnyilFU="  # noqa
-    # CHANNEL_SECRET_TOKEN = "6fd6a21c86d311aaf115d9588cc5fc46"
 
     OFFICIAL_PUSH_API = "https://api.line.me/v2/bot/message/push"
     OFFICIAL_NOTIFY_API = "https://notify-api.line.me/api/notify"
