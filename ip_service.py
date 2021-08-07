@@ -1,5 +1,6 @@
 import subprocess
 import re
+import time
 from pathlib import Path
 from log import logger, get_handler
 
@@ -25,7 +26,9 @@ def get_ip(mode):
 
 def check_ip(curr_win_ip, curr_wsl_ip):
     try:
-        with open("ip_memo.txt", "r") as f:
+        # TODO Win工作排程器路徑預設都是Windows32
+        file_path = r"C:\Users\Roy\Documents\GitHub\MyGit_folder\Projects\Send_IP_for_me\ip_memo.txt"
+        with open(file_path, "r") as f:
             raw = f.read()
             raw_list = raw.split(" ")
             prev_win_ip = raw_list[0]
@@ -41,7 +44,7 @@ def check_ip(curr_win_ip, curr_wsl_ip):
         else:
             logger.info(f"您的Win and WSL IP皆已變更! old Win/WSL IP: {prev_win_ip} / {prev_wsl_ip}\n"
                         f"new Win/WSL IP: {curr_win_ip} / {curr_wsl_ip}")
-        with open("ip_memo.txt", "w") as f:
+        with open(file_path, "w") as f:
             f.write(f"{curr_win_ip} {curr_wsl_ip}")
     except Exception as e:
         logger.error(f"{check_ip.__name__} failed: {e}")
@@ -90,24 +93,34 @@ def get_windows_ip_info(std_out):
     print("找不到Windows IP")
 
 
-def readdata():
-    keyword1 = '無線區域網路介面卡 Wi-Fi'
-    keyword2 = '乙太網路卡 乙太網路'
+# def readdata():
+#     keyword1 = '無線區域網路介面卡 Wi-Fi'
+#     keyword2 = '乙太網路卡 乙太網路'
 
-    # HINT: ref: https://stackoverflow.com/questions/5284147/validating-ipv4-addresses-with-regexp
-    ip_pattern = "((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)(\\.(?!$)|$)){4}$"
+#     # HINT: ref: https://stackoverflow.com/questions/5284147/validating-ipv4-addresses-with-regexp
+#     ip_pattern = "((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)(\\.(?!$)|$)){4}$"
 
-    with open("ipoutput.txt", "r", encoding="utf-8") as r:
-        output = r.readlines()
-        for index, lines in enumerate(output):
-            if lines.startswith(keyword1) or lines.startswith(keyword2):
-                ipv4_rawdata = output[index+4]
-                break
-    ipv4_addr = re.search(ip_pattern, ipv4_rawdata).group(0)
+#     with open("ipoutput.txt", "r", encoding="utf-8") as r:
+#         output = r.readlines()
+#         for index, lines in enumerate(output):
+#             if lines.startswith(keyword1) or lines.startswith(keyword2):
+#                 ipv4_rawdata = output[index+4]
+#                 break
+#     ipv4_addr = re.search(ip_pattern, ipv4_rawdata).group(0)
+
+
+def init_log():
+    log_name = Path(r"C:\Users\Roy\Documents\GitHub\MyGit_folder\Projects\Send_IP_for_me", "logs", "ip_info.log")
+    print(log_name)
+    time.sleep(3)
+    path = log_name.parent
+    if not (path.exists() and path.is_dir()):
+        Path.mkdir(path)
+    logger.addHandler(get_handler(log_name))
 
 
 if __name__ == "__main__":
-    log_name = Path(Path.cwd(), "logs", "ip_info.log")
-    logger.addHandler(get_handler(log_name))
+    print("System start...")
+    init_log()
     win_ipv4_addr, wsl_ipv4_addr = get_ip("var")
     check_ip(win_ipv4_addr, wsl_ipv4_addr)
