@@ -1,7 +1,12 @@
+
+
 from flask_restx import Api
 from flask import Blueprint
+
 from app.main import jwt
+
 from app.main.controller.ip_controller import api as ip_ns
+
 
 blueprint = Blueprint("api",
                       __name__,

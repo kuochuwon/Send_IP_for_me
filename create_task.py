@@ -27,7 +27,7 @@ def create_task_check_ip(start_time):
     subprocess.Popen(create_command, stdout=subprocess.PIPE, shell=True)
 
 
-def delete_task_by_name(task_name="ip_service.py"):
+def delete_task_by_name(task_name="IP checking"):
     task_name = Path("Roy toolkits", task_name)
     delete_command = cmd_delete_task(str(task_name))
     subprocess.Popen(delete_command, stdout=subprocess.PIPE, shell=True)
@@ -54,5 +54,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    print(Path.cwd())
-    time.sleep(3)

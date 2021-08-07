@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 # from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from pathlib import Path
-
 from app.main.config import get_config, Config
 from app.main.log import logger, get_handler
 

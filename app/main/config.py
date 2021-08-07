@@ -20,11 +20,12 @@ class Config:
         "max_overflow": int(os.getenv("DATABASE_MAX_OVERFLOW") or "5"),
     }
 
-    filename = os.getenv("LOG_FILE") or "server"
+    # filename = os.getenv("LOG_FILE") or "server" #TODO maybe can delete
 
     # absolute path for safety
-    LOG_FILE = Path(Path.cwd(), "log", f"{filename}.log")
-    path = LOG_FILE.parent
+    # LOG_FILE = Path(Path.cwd(), "logs", f"{filename}.log")
+    # path = LOG_FILE.parent
+    path = Path(Path.cwd(), "logs")
     if not (path.exists() and path.is_dir()):
         Path.mkdir(path)
 

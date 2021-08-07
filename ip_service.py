@@ -1,8 +1,14 @@
+from dotenv import load_dotenv
 import subprocess
 import re
+import os
 import time
 from pathlib import Path
-from log import logger, get_handler
+
+base_dir = os.path.abspath(os.path.dirname(__file__))  # noqa 為了在import app.main以前將環境變數載入，main/init裡面有config會呼叫到.env
+dotenv_path = os.path.join(base_dir, ".env")  # noqa
+load_dotenv(dotenv_path=dotenv_path)  # noqa
+from app.main.log import logger, get_handler  # noqa
 
 
 def get_ip(mode):
@@ -110,7 +116,8 @@ def get_windows_ip_info(std_out):
 
 
 def init_log():
-    log_name = Path(r"C:\Users\Roy\Documents\GitHub\MyGit_folder\Projects\Send_IP_for_me", "logs", "ip_info.log")
+    # log_name = Path(r"C:\Users\Roy\Documents\GitHub\MyGit_folder\Projects\Send_IP_for_me", "logs", "ip_info.log")
+    log_name = Path(Path.cwd(), "logs", "ip_info.log")
     print(log_name)
     time.sleep(3)
     path = log_name.parent
@@ -121,6 +128,7 @@ def init_log():
 
 if __name__ == "__main__":
     print("System start...")
+    time.sleep(3)
     init_log()
-    win_ipv4_addr, wsl_ipv4_addr = get_ip("var")
-    check_ip(win_ipv4_addr, wsl_ipv4_addr)
+    # win_ipv4_addr, wsl_ipv4_addr = get_ip("var")
+    # check_ip(win_ipv4_addr, wsl_ipv4_addr)
