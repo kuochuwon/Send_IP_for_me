@@ -1,4 +1,3 @@
-from logging import log
 from dotenv import load_dotenv
 import subprocess
 import re
@@ -149,6 +148,7 @@ def get_windows_ip_info(std_out):
 def init_log():
     # log_name = Path(r"C:\Users\Roy\Documents\GitHub\MyGit_folder\Projects\Send_IP_for_me", "logs", "ip_info.log")
     log_name = Path(Path.cwd(), "logs", "ip_info.log")
+
     # print(log_name)
     # time.sleep(3)
     path = log_name.parent
@@ -158,7 +158,6 @@ def init_log():
 
 
 if __name__ == "__main__":
-    print("System start...")
     init_log()
     win_ipv4_addr, wsl_ipv4_addr = get_ip("var")
     check_ip_and_update_netsh_rule(win_ipv4_addr, wsl_ipv4_addr)
