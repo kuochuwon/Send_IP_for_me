@@ -31,7 +31,10 @@ def get_ip(mode):
 
 
 def load_ip():
-    file_path = Path(Path.cwd(), "ip_memo.txt")
+    # file_path = Path(Path.cwd(), "ip_memo.txt")
+
+    # TODO for wsl
+    file_path = "/mnt/c/Users/Roy/Documents/GitHub/MyGit_folder/Projects/Send_IP_for_me/ip_memo.txt"
     with open(file_path, "r") as f:
         raw = f.read()
         raw_list = raw.split(" ")
