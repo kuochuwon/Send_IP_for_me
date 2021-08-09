@@ -1,6 +1,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
+
 LOG_FORMAT = "[%(asctime)s] [%(levelname)s] [%(module)s] [%(threadName)s] %(message)s"
 
 logging.basicConfig(
