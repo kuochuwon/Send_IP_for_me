@@ -1,3 +1,4 @@
+from logging import log
 from dotenv import load_dotenv
 import subprocess
 import re
@@ -30,36 +31,66 @@ def get_ip(mode):
         return None
 
 
-def check_ip(curr_win_ip, curr_wsl_ip):
+def load_ip():
+    file_path = Path(Path.cwd(), "ip_memo.txt")
+    with open(file_path, "r") as f:
+        raw = f.read()
+        raw_list = raw.split(" ")
+        win_ip = raw_list[0]
+        wsl_ip = raw_list[1]
+    os_type = os.name
+    if os_type == "nt":
+        return win_ip
+    else:
+        return wsl_ip
+
+
+def check_ip_and_update_netsh_rule(curr_win_ip, curr_wsl_ip):
     try:
         # TODO Win工作排程器路徑預設都是Windows32
-        file_path = r"C:\Users\Roy\Documents\GitHub\MyGit_folder\Projects\Send_IP_for_me\ip_memo.txt"
+        # file_path = r"C:\Users\Roy\Documents\GitHub\MyGit_folder\Projects\Send_IP_for_me\ip_memo.txt"
+        file_path = Path(Path.cwd(), "ip_memo.txt")
+        # HINT netsh命令必須有系統管理員身分才可執行，已測試若在工作排程器將安全性選項設定以最高權限執行，可使命令生效
+
         with open(file_path, "r") as f:
             raw = f.read()
             raw_list = raw.split(" ")
             prev_win_ip = raw_list[0]
             prev_wsl_ip = raw_list[1]
 
+        delete_netsh_command = f"netsh interface portproxy delete v4tov4 listenport=1942 listenaddress={prev_win_ip}"
+        add_netsh_command = (f"netsh interface portproxy add v4tov4 listenport=1942 listenaddress={curr_win_ip} "
+                             f"connectport=1942 connectaddress={curr_wsl_ip}")
+
         if (curr_win_ip == prev_win_ip) and (curr_wsl_ip == prev_wsl_ip):
             logger.info("您的IP未偵測到變更")
             return
         elif (curr_win_ip == prev_win_ip) and (curr_wsl_ip != prev_wsl_ip):
             logger.info(f"偵測到WSL IP變更! old: {prev_wsl_ip}, new: {curr_wsl_ip}")
+            get_info_from_cmd(delete_netsh_command)
+            get_info_from_cmd(add_netsh_command)
         elif (curr_win_ip != prev_win_ip) and (curr_wsl_ip == prev_wsl_ip):
             logger.info(f"偵測到Win IP變更! old: {prev_win_ip}, new: {curr_win_ip}")
+            get_info_from_cmd(delete_netsh_command)
+            get_info_from_cmd(add_netsh_command)
         else:
             logger.info(f"您的Win and WSL IP皆已變更! old Win/WSL IP: {prev_win_ip} / {prev_wsl_ip}\n"
                         f"new Win/WSL IP: {curr_win_ip} / {curr_wsl_ip}")
+            get_info_from_cmd(delete_netsh_command)
+            get_info_from_cmd(add_netsh_command)
         with open(file_path, "w") as f:
             f.write(f"{curr_win_ip} {curr_wsl_ip}")
     except Exception as e:
-        logger.error(f"{check_ip.__name__} failed: {e}")
+        logger.error(f"{check_ip_and_update_netsh_rule.__name__} failed: {e}")
 
 
 def get_info_from_cmd(command):
-    p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
-    output = p.stdout.read().decode("big5").strip()
-    return output
+    try:
+        p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        output = p.stdout.read().decode("big5").strip()
+        return output
+    except Exception as e:
+        logger.error(f"{get_info_from_cmd.__name__} failed: {e}")
 
 
 def get_wsl_ip_info(std_out):
@@ -118,8 +149,8 @@ def get_windows_ip_info(std_out):
 def init_log():
     # log_name = Path(r"C:\Users\Roy\Documents\GitHub\MyGit_folder\Projects\Send_IP_for_me", "logs", "ip_info.log")
     log_name = Path(Path.cwd(), "logs", "ip_info.log")
-    print(log_name)
-    time.sleep(3)
+    # print(log_name)
+    # time.sleep(3)
     path = log_name.parent
     if not (path.exists() and path.is_dir()):
         Path.mkdir(path)
@@ -128,7 +159,6 @@ def init_log():
 
 if __name__ == "__main__":
     print("System start...")
-    time.sleep(3)
     init_log()
-    # win_ipv4_addr, wsl_ipv4_addr = get_ip("var")
-    # check_ip(win_ipv4_addr, wsl_ipv4_addr)
+    win_ipv4_addr, wsl_ipv4_addr = get_ip("var")
+    check_ip_and_update_netsh_rule(win_ipv4_addr, wsl_ipv4_addr)

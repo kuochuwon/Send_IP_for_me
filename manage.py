@@ -1,3 +1,4 @@
+from ip_service import load_ip
 import os
 import unittest
 from flask_migrate import Migrate
@@ -50,4 +51,5 @@ def run():
 
 
 if __name__ == "__main__":
-    app.run()
+    ip = load_ip()
+    app.run(host=str(ip), port=1942)

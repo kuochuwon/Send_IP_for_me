@@ -24,7 +24,7 @@ def create_task_check_ip(start_time):
     python_path = Path(base_path, "venv/Scripts/python.exe")
     script_name = Path(base_path, "ip_service.py")
     create_command = cmd_create_task(str(task_path), str(python_path), str(script_name), start_time)
-    subprocess.Popen(create_command, stdout=subprocess.PIPE, shell=True)
+    subprocess.Popen(create_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
 
 def delete_task_by_name(task_name="IP checking"):
