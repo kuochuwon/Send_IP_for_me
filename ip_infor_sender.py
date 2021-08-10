@@ -1,17 +1,18 @@
 import requests as urllib_requests
+import os
 from constant import LineConstant
 from ip_service import get_ip
 
-roy_id = "U9afa5683614c2f30296a92eb07984d57"
+user_id = os.getenv("RECIPIENT_ID")
 
 
 def execute():
     try:
         msg = get_ip()
-        if roy_id and msg:
+        if user_id and msg:
             token_identifier = "IP_service"
             json_for_msg = dict(
-                to=roy_id,
+                to=user_id,
                 messages=[{
                     "type": "text",
                     "text": msg

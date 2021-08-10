@@ -31,7 +31,8 @@ def get_ip(mode):
 
 
 def load_ip():
-    file_path = Path(Path.cwd(), "ip_memo.txt")
+    memo_path = os.getenv("IP_Path")
+    file_path = Path(memo_path, "ip_memo.txt")
     with open(file_path, "r") as f:
         raw = f.read()
         raw_list = raw.split(" ")
@@ -46,8 +47,8 @@ def load_ip():
 
 def check_ip_and_update_netsh_rule(curr_win_ip, curr_wsl_ip):
     try:
-        # TODO Win工作排程器路徑預設都是Windows32
-        file_path = Path(Path.cwd(), "ip_memo.txt")
+        memo_path = os.getenv("IP_Path")
+        file_path = Path(memo_path, "ip_memo.txt")
 
         with open(file_path, "r") as f:
             raw = f.read()
@@ -105,8 +106,6 @@ def get_wsl_ip_info(std_out):
 
 
 def extract_ip(string):
-    # HINT 此pattern允許字串中合法IP後面跟著其他字元，但只會擷取合法IP
-    # ip_pattern_loose = "((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)(\\.(?!$)|)){4}"
     ip_pattern = "((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)(\\.(?!$)|$)){4}$"
     try:
         ipv4_addr = re.search(ip_pattern, string.strip()).group(0)
