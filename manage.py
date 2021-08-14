@@ -44,3 +44,4 @@ def run():
 if __name__ == "__main__":
     ip = load_ip()
     app.run(host=str(ip), port=1942)
+    # app.run()

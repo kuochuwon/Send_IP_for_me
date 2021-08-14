@@ -2,13 +2,16 @@ from dotenv import load_dotenv
 import subprocess
 import re
 import os
+import json
 import time
 from pathlib import Path
+
 
 base_dir = os.path.abspath(os.path.dirname(__file__))  # noqa 為了在import app.main以前將環境變數載入，main/init裡面有config會呼叫到.env
 dotenv_path = os.path.join(base_dir, ".env")  # noqa
 load_dotenv(dotenv_path=dotenv_path)  # noqa
 from app.main.log import logger, get_handler  # noqa
+import requests as urllib_requests  # noqa
 
 
 def get_ip(mode):
@@ -45,6 +48,18 @@ def load_ip():
         return wsl_ip
 
 
+def update_remote_ip_record(win_ip, wsl_ip):
+    heroku_api_url = "https://linebot-kuochuwon.herokuapp.com/api/v1/ip/update_ip"
+    ip_info = {"win_ip": win_ip, "wsl_ip": wsl_ip, "port": "unknown", "access_url": "unknown"}
+
+    user_result = urllib_requests.post(
+        heroku_api_url,
+        headers={'content-type': 'application/json'},
+        data=json.dumps(ip_info),  # 若失敗就試試改json=json.dumps()
+    )
+    print(f"Heroku HTTP狀態碼: {user_result.status_code}")
+
+
 def check_ip_and_update_netsh_rule(curr_win_ip, curr_wsl_ip):
     try:
         memo_path = os.getenv("IP_Path")
@@ -77,6 +92,8 @@ def check_ip_and_update_netsh_rule(curr_win_ip, curr_wsl_ip):
                         f"new Win/WSL IP: {curr_win_ip} / {curr_wsl_ip}")
             get_info_from_cmd(delete_netsh_command)
             get_info_from_cmd(add_netsh_command)
+
+        update_remote_ip_record(curr_win_ip, curr_wsl_ip)
         with open(file_path, "w") as f:
             f.write(f"{curr_win_ip} {curr_wsl_ip}")
     except Exception as e:
