@@ -7,6 +7,7 @@ from app.main.view.ip_response import get_current_ip, get_access_url
 
 api = IpDto.api
 _header = IpDto.header
+_var_passing = IpDto.var_passing
 
 response_status = {status.HTTP_200_OK: ret.get_code_full(ret.RET_OK),
                    status.HTTP_401_UNAUTHORIZED: ret.get_code_full(ret.RET_NO_CUST_ID),
@@ -31,4 +32,15 @@ class GetIP(Resource):
         response["win_ip"] = win_ip
         response["wsl_ip"] = wsl_ip
         response["access_url"] = flask_url
+        return ret.http_resp(ret.RET_OK, extra=response), status.HTTP_200_OK
+
+
+@api.route("/var_passing")
+class VarPassing(Resource):
+    @api.expect(_header, _var_passing, validate=True)
+    @api.doc(responses=response_status)
+    def post(self):
+        payload = request.json
+        pass
+        response = None
         return ret.http_resp(ret.RET_OK, extra=response), status.HTTP_200_OK
