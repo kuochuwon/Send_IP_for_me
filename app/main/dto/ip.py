@@ -3,7 +3,7 @@ import random
 
 
 class RandomNumber(fields.Raw):
-    def output(self, key, obj):
+    def output(self):
         return random.random()
 
 
@@ -17,8 +17,6 @@ class IpDto:
     var_passing = api.model(
         "var_passing", {
             'name': fields.String,
-            # todo_resource is the endpoint name when you called api.route()
-            'uri': fields.Url('todo_resource'),
-            'random': RandomNumber,
+            'uri': fields.Url(absolute=True, scheme='https')
         }
     )

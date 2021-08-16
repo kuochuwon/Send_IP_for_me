@@ -39,8 +39,9 @@ class GetIP(Resource):
 class VarPassing(Resource):
     @api.expect(_header, _var_passing, validate=True)
     @api.doc(responses=response_status)
+    @api.marshal_with(_var_passing)
     def post(self):
         payload = request.json
         pass
-        response = None
+        response = payload
         return ret.http_resp(ret.RET_OK, extra=response), status.HTTP_200_OK
